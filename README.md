@@ -108,14 +108,7 @@ __mdpi、hdpi、xdpi、xxdpi__
 
  __使用Orientation限定符__
 
-  有些布局会在横屏和竖屏的情况下都显示的很好，但是多数情况下这些布局都可以再调整的。我们可以针对布局在不同屏幕尺寸和不同屏幕方向中做不同的调整：
-
-   * 小屏幕, 竖屏: 单面板, 显示logo
-   * 小屏幕, 横屏: 单面板, 显示logo
-   * 7寸平板, 竖屏: 单面板, 显示action bar
-   * 7寸平板, 横屏: 双面板, 宽, 显示action bar
-   * 10寸平板, 竖屏: 双面板, 窄, 显示action bar
-   * 10寸平板, 横屏: 双面板, 宽, 显示action bar
+  有些布局会在横屏和竖屏的情况下都显示的很好，但是多数情况下这些布局都可以再调整的。我们可以针对布局在不同屏幕尺寸和不同屏幕方向中做不同的调整.
 
 
 ### 提供可以根据屏幕大小自动伸缩的图片
@@ -192,7 +185,6 @@ __mdpi、hdpi、xdpi、xxdpi__
 
   首先来看看布局文件中dp的转换，最终都是调用 TypedValue#applyDimension(int unit, float value, DisplayMetrics metrics) 来进行转换：
 
-'''
     public static float applyDimension(int unit, float value,
                                        DisplayMetrics metrics)
     {
@@ -212,13 +204,11 @@ __mdpi、hdpi、xdpi、xxdpi__
         }
         return 0;
     }
-'''
 
 这里用到的DisplayMetrics正是从Resources中获得的。
 
 再看看图片的decode，BitmapFactory#decodeResourceStream方法:
 
-'''
     public static Bitmap decodeResourceStream(@Nullable Resources res, @Nullable TypedValue value,
             @Nullable InputStream is, @Nullable Rect pad, @Nullable Options opts) {
         validate(opts);
@@ -241,7 +231,6 @@ __mdpi、hdpi、xdpi、xxdpi__
         
         return decodeStream(is, pad, opts);
     }
-'''
 
 可见也是通过 DisplayMetrics 中的值来计算的。
 
@@ -251,7 +240,6 @@ __mdpi、hdpi、xdpi、xxdpi__
 
 那么适配后的 density = 设备真实宽(单位px)/360，接下来只需要把我们计算好的 density 在系统中修改下即可。通用代码实现如下：
 
-'''
     public static void setCustomDensity(@Nullable Activity activity, @Nullable Application application,int baseDp){
         final DisplayMetrics appDisplayMetrics = application.getResources().getDisplayMetrics();
         final float targetDensity = appDisplayMetrics.widthPixels / baseDp;
@@ -264,7 +252,6 @@ __mdpi、hdpi、xdpi、xxdpi__
         activityDisplayMetrics.densityDpi = targetDensityDpi;
     }
 
-'''
 
 同时在 Activity#onCreate 方法中调用下。代码比较简单，也没有涉及到系统非公开api的调用，因此理论上不会影响app稳定性。
 
@@ -301,7 +288,7 @@ __mdpi、hdpi、xdpi、xxdpi__
 #### smallestWidth 的值是怎么算的？
 
     我们假设设备的屏幕信息是 1920 * 1080、480 dpi
-
+    
     根据上面的规则我们要在屏幕的高度和宽度中选择值最小的一方作为最小宽度，1080 < 1920，明显 1080 px 就是我们要找的 最小宽度 的值，但 最小宽度 的单位是 dp，所以我们要把 px 转换为 dp
 
     下面的公式一定不能再忘了！
