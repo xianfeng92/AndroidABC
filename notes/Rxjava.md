@@ -1,7 +1,7 @@
 
 # 基本介绍
 
-  RxJava 本质上可以说到它就是一个实现异步操作的库. 异步操作很关键的一点是程序的简洁性，因为在调度过程比较复杂的情况下，异步代码经常会既难写也难被读懂。 Android 创造的 AsyncTask 和 Handler , 其实都是为了让异步代码更加简洁。RxJava 的优势也是简洁，但它的简洁的与众不同之处在于，随着程序逻辑变得越来越复杂，它依然能够保持简洁.
+  RxJava 本质上可以说到它就是一个实现异步操作的库。异步操作很关键的一点是程序的简洁性，因为在调度过程比较复杂的情况下，异步代码经常会既难写也难被读懂。 Android 创造的 AsyncTask 和 Handler , 其实都是为了让异步代码更加简洁。RxJava 的优势也是简洁，但它的简洁的与众不同之处在于，随着程序逻辑变得越来越复杂，它依然能够保持简洁。
 
 ## RxJava 的观察者模式
 
@@ -9,7 +9,7 @@
 
 ### 基于以上的概念， RxJava 的基本实现主要有三点:
 
-1. 创建 Observer
+1. 创建 Observer & 定义响应事件的行为
 
 ```
   // Observer 即观察者，它决定事件触发的时候将有怎样的行为
@@ -39,7 +39,7 @@
 ```
 
 
-2. 创建 Observable
+2. 创建 Observable & 定义需发送的事件
 
 ```
     // Observable 即被观察者，它决定什么时候触发事件以及触发怎样的事件
@@ -65,8 +65,7 @@ String[] os = new String[]{"Android","IOS","Other"};
 Observable<String> observable2 = Observable.fromArray(os);
 ```
 
-
-3.  Subscribe (订阅)
+3.  Subscribe (订阅) & 连接观察者和被观察者
 
     创建了 Observable 和 Observer 之后，再用 subscribe() 方法将它们联结起来，整条链子就可以工作了。
 
@@ -78,7 +77,7 @@ observable.subscribe(observer);
 
 ## 线程控制--Scheduler
 
-   在不指定线程的情况下， RxJava 遵循的是线程不变的原则，即：在哪个线程调用 subscribe()，就在哪个线程生产事件; 在哪个线程生产事件，就在哪个线程消费事件。
+   __在不指定线程的情况下， RxJava 遵循的是线程不变的原则__，即：在哪个线程调用 subscribe()，就在哪个线程生产事件; 在哪个线程生产事件，就在哪个线程消费事件。
    如果需要切换线程，就需要用到 Scheduler （调度器）。
 
    在RxJava 中，Scheduler ——调度器，相当于线程控制器，RxJava 通过它来指定每一段代码应该运行在什么样的线程。RxJava 已经内置了几个 Scheduler ，它们已经适合大多数的使用场景：
@@ -104,7 +103,9 @@ observable.subscribe(observer);
 ```
 
 
-关于 Scheduler 的原理,其实就是使用lift变化来实现线程的切换.
+PS：
+
+ subscribeOn() 的线程控制可以从事件发出的开端就造成影响， 而 observeOn() 控制的是它后面的线程
 
 
 
