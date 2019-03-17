@@ -1,12 +1,23 @@
 
-# Hook技术之Activity的启动过程拦截
+# Android Hook技术介绍和应用
 
-## 1、寻找Hook点的原则
+[Demo](https://github.com/xianfeng92/Android_Dy_Load)
+
+## 什么是 Hook?
+   
+   Hook 英文翻译过来就是「钩子」的意思，那我们在什么时候使用这个「钩子」呢？在 Android 操作系统中系统维护着自己的一套事件分发机制。应用程序，包括应用触发事件和后台逻辑处理，也是根据事件流程一步步地向下执行。而「钩子」的意思，就是在事件传送到终点前截获并监控事件的传输，像个钩子钩上事件一样，并且能够在钩上事件时，处理一些自己特定的事件。Hook 的这个本领，使它能够将自身的代码「融入」被勾住（Hook）的程序的进程中，成为目标进程的一个部分。API Hook 技术是一种用于改变 API 执行结果的技术，能够将系统的 API 函数执行重定向。在 Android系统中使用了沙箱机制，普通用户程序的进程空间都是独立的，程序的运行互不干扰。这就使我们希望通过一个程序改变其他程序的某些行为的想法不能直接实现，但是 Hook 的出现给我们开拓了解决此类问题的道路。
+
+## 使用 Java 反射实现 API Hook
+ 
+   通过对 Android 平台的虚拟机注入与 Java 反射的方式，来改变 Android 虚拟机调用函数的方式（ClassLoader），从而达到 Java 函数重定向的目的，这里我们将此类操作称为 Java API Hook。
+
+
+## 寻找Hook点的原则
 
    什么样的对象比较好Hook呢？一般来说，静态变量和单例变量是相对不容易改变，是一个比较好的hook点，而普通的对象有易变的可能，当Andorid源码版本变化时可能会不一样，处理难度比较大。
    我们根据这个原则找到所谓的Hook点。
 
-## 2、寻找Hook点
+## 寻找Hook点
 
   通常点击一个Button就开始Activity跳转了，这中间发生了什么，我们如何Hook,来实现Activity启动的拦截呢？
 
@@ -103,8 +114,7 @@
 
 所有 Activity 启动是一个跨进程的通信的过程，所以真正启动 Activity 的是通过远端服务 ActivityManagerService 来启动的。其中 IActivityManagerSingleton 是借助 Singleton 实现的单例模式.而在内部可以看到先从 ServiceManager 中获取到AMS远端服务的 Binder 对象，然后使用 asInterface 方法转化成本地化对象，我们目的是拦截 startActivity ,所以改变 IActivityManager 对象可以做到这个一点，这里 IActivityManagerSingleton 又是静态的，根据Hook原则，这是一个比较好的Hook点。
 
-
-## 3、Hook掉startActivity，输出日志
+##  Hook掉startActivity，输出日志
    
    我们先实现一个小需求，启动 Activity 的时候打印一条日志，写一个工具类HookUtil。
 
@@ -189,7 +199,7 @@ public class HookUtil {
 
 大功告成~~~
 
-## 4、无需注册，启动Activity
+##  无需注册，启动Activity
 
   如下, SecActivity 没有在清单文件中注册，怎么去启动 SecActivity ？
 
@@ -399,8 +409,23 @@ PS: Android P 中启动流程主要变化:
 这样可以减轻 ActivityThread 的压力，将生命周期抽成一个具体的对象，更有利于生命周期的管理。以及降低了耦合度。
 
 
+## 总结一下：
+
+Hook 的选择点：静态变量和单例，因为一旦创建对象，它们不容易变化，非常容易定位。
+
+Hook 过程：
+
+* 寻找 Hook 点，原则是静态变量或者单例对象，尽量 Hook public 的对象和方法。
+
+* 选择合适的代理方式，如果是接口可以用动态代理。
+
+* 偷梁换柱——用代理对象替换原始对象。
+
+* Android 的 API 版本比较多，方法和类可能不一样，所以要做好 API
+
 
 # 参考
 
 [Android插件化系列第（一）篇---Hook技术之Activity的启动过程拦截](https://www.jianshu.com/p/69bfbda302df)
+[理解 Android Hook 技术以及简单实战](https://www.jianshu.com/p/4f6d20076922)
 

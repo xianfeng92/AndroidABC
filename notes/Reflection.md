@@ -1,6 +1,7 @@
 
 # Reflection
 
+
 ## 动态语言
 
 __一般认为在程序运行时，允许改变程序结构或变量类型，这种语言称为动态语言__。从这个观点看，Perl，Python，Ruby 是动态语言，C++，Java，C# 不是动态语言。
@@ -13,13 +14,17 @@ __一般认为在程序运行时，允许改变程序结构或变量类型，这
 
 ## 反射
 
-当一个类被加载以后，Java虚拟机就会自动产生一个Class对象。通过这个Class对象我们就能获得加载到虚拟机当中这个Class对象对应的方法、成员以及构造方法的声明和定义等信息。
+Java编写的程序，一次编译，到处运行。这也是Java程序为什么是无关平台的所在，原因在于，java的源代码会被编译成.class文件字节码，只要装有Java虚拟机JVM的地方（Java提供了各种不同平台上的虚拟机制，第一步由Java IDE进行源代码编译，得到相应类的字节码.class文件，第二步，Java字节码由JVM执行解释给目标计算机，第三步，目标计算机将结果呈现给我们计算机用户；因此，Java并不是编译机制，而是解释机制），.class文件畅通无阻。Java的反射机制，操作的就是这个.class文件，首先加载相应类的字节码,随后解剖（反射 reflect）出字节码中的构造函数、方法以及变量（字段），或者说是取出.
+
+在Java中，每个.class文件中都有一个相应的Class对象,用于表示这个类的类型信息.通过这个 Class 对象我们就能获得加载到虚拟机当中这个Class对象对应的方法、成员以及构造方法的声明和定义等信息。如果我们要产生某个类的对象，Java虚拟机（JVM）会检查该类型的Class对象是否已被加载。如果没有被加载，JVM会根据类的名称找到.class文件并加载它。一旦某个类型的Class对象已被加载到内存，就可以用它来产生该类型的所有对象。
+
+
 反射机制的优点就是可以实现动态创建对象和编译，体现出很大的灵活性。它的缺点是对性能有影响。使用反射基本上是一种解释操作，我们可以告诉JVM，
 我们希望做什么并且它满足我们的要求。这类操作总是慢于只直接执行相同的操作。
 
 了解这些，那我们就知道了，我们可以利用反射机制在Java程序中，动态的去调用一些protected甚至是private的方法或类，这样可以很大程度上满足我们的一些比较特殊需求。
 
-例如 Activity 的启动过程中 Activity 的对象的创建。`
+例如 Activity 的启动过程中 Activity 的对象的创建。
 
 ```
 private Activity performLaunchActivity(ActivityClientRecord r, Intent customIntent) {
@@ -57,18 +62,14 @@ private Activity performLaunchActivity(ActivityClientRecord r, Intent customInte
 而这个动态加载的机制就是通过ClassLoader来实现的，所以可想而知ClassLoader的重要性如何。 
 
 上面说到JAVA的动态加载的机制就是通过 ClassLoader 来实现的，ClassLoader 也是实现反射的基石。ClassLoader 是JAVA提供的一个类，
-顾名思义，它就是用来加载Class文件到JVM，以供程序使用的。
-
-但是问题来了，ClassLoader加载文件到JVM，但是Android是基于DVM的，用ClassLoader加载文件进DVM肯定是不行的。于是Android提供了另外一套加载机制，
-分别为 dalvik.system.DexClassLoader 和 dalvik.system.PathClassLoader，区别在于 PathClassLoader 不能直接从 zip 包中得到 dex，
-因此只支持直接操作 dex 文件或者已经安装过的 apk（因为安装过的 apk 在 cache 中存在缓存的 dex 文件）。
-而 DexClassLoader 可以加载外部的 apk、jar 或 dex文件，并且会在指定的 outpath 路径存放其 dex 文件。
+顾名思义，它就是用来加载Class文件到JVM，以供程序使用的。但是问题来了，ClassLoader加载文件到JVM，但是Android是基于DVM的，用ClassLoader加载文件进DVM肯定是不行的。
+于是Android提供了另外一套加载机制，分别为 dalvik.system.DexClassLoader 和 dalvik.system.PathClassLoader，区别在于 PathClassLoader 不能直接从 zip 包中得到 dex，因此只支持直接操作 dex 文件或者已经安装过的 apk（因为安装过的 apk 在 cache 中存在缓存的 dex 文件）。而 DexClassLoader 可以加载外部的 apk、jar 或 dex 文件，并且会在指定的 outpath 路径存放其 dex 文件。
 
 # Reflection基本操作
 
 ## Class 的获取
 
-反射的入口是 Class，但是反射中 Class 是没有公开的构造方法的，所以就没有办法像创建一个类一样通过 new 关键字来获取一个 Class 对象。
+反射的入口是 Class, 但是反射中 Class 是没有公开的构造方法的，所以就没有办法像创建一个类一样通过 new 关键字来获取一个 Class 对象。
 不过，不用担心，Java 反射中 Class 的获取可以通过下面 3 种方式:
 
 ```
